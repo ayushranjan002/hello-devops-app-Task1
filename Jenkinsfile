@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "🔹 Cloning the repository..."
-                git 'https://github.com/<your-username>/hello-devops-app.git'
+                git 'https://github.com/ayushranjan002/hello-devops-app-Task1.git'
             }
         }
 
