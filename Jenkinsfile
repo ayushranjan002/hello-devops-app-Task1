@@ -4,6 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = "hello-devops-app"
         CONTAINER_NAME = "hello-devops-container"
+        HOST_PORT = "8085"
+        APP_PORT = "5000"
     }
 
     stages {
@@ -17,23 +19,30 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image..."
-                bat "docker build -t %IMAGE_NAME% ."
+                bat """
+                    docker build -t %IMAGE_NAME% .
+                """
             }
         }
 
         stage('Run Container') {
-    steps {
-        echo "🚀 Running Docker container..."
-        bat 'docker ps -a -q --filter name=%CONTAINER_NAME% | findstr . && docker rm -f %CONTAINER_NAME% || echo No old container to remove.'
-        bat 'docker run -d -p 8085:5000 --name %CONTAINER_NAME% %IMAGE_NAME%'
-    }
-}
-
+            steps {
+                echo "🚀 Running Docker container..."
+                bat """
+                    docker ps -a -q --filter name=%CONTAINER_NAME% | findstr . && docker rm -f %CONTAINER_NAME% || echo No old container to remove.
+                    docker run -d -p %HOST_PORT%:%APP_PORT% --name %CONTAINER_NAME% %IMAGE_NAME%
+                """
+            }
+        }
 
         stage('Verify Deployment') {
             steps {
                 echo "🔍 Verifying running containers..."
-                bat "docker ps"
+                bat """
+                    docker ps
+                    echo Checking logs for %CONTAINER_NAME%
+                    docker logs %CONTAINER_NAME%
+                """
             }
         }
     }
@@ -41,9 +50,13 @@ pipeline {
     post {
         success {
             echo "✅ Build and Deployment Successful!"
+            echo "🌐 Visit your app at: http://localhost:8085"
         }
         failure {
-            echo "❌ Build failed. Check logs."
+            echo "❌ Build failed. Check logs above for details."
         }
     }
 }
+git add Jenkinsfile
+git commit -m "Final Jenkinsfile with verification"
+git push origin main
