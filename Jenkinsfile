@@ -22,14 +22,13 @@ pipeline {
         }
 
         stage('Run Container') {
-            steps {
-                echo "🚀 Running Docker container..."
-                // Stop and remove old container if exists
-                bat "docker ps -a -q --filter name=%CONTAINER_NAME% | findstr . && docker rm -f %CONTAINER_NAME% || echo No old container to remove."
-                // Run new container
-                bat "docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%"
-            }
-        }
+    steps {
+        echo "🚀 Running Docker container..."
+        bat 'docker ps -a -q --filter name=%CONTAINER_NAME% | findstr . && docker rm -f %CONTAINER_NAME% || echo No old container to remove.'
+        bat 'docker run -d -p 8085:5000 --name %CONTAINER_NAME% %IMAGE_NAME%'
+    }
+}
+
 
         stage('Verify Deployment') {
             steps {
