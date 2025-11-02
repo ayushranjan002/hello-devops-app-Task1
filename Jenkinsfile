@@ -11,23 +11,21 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                echo "🔹 Cloning the repository..."
+                echo "Cloning the repository..."
                 git branch: 'main', url: 'https://github.com/ayushranjan002/hello-devops-app-Task1.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "🐳 Building Docker image..."
-                bat """
-                    docker build -t %IMAGE_NAME% .
-                """
+                echo "Building Docker image..."
+                bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
         stage('Run Container') {
             steps {
-                echo "🚀 Running Docker container..."
+                echo "Running Docker container..."
                 bat """
                     docker ps -a -q --filter name=%CONTAINER_NAME% | findstr . && docker rm -f %CONTAINER_NAME% || echo No old container to remove.
                     docker run -d -p %HOST_PORT%:%APP_PORT% --name %CONTAINER_NAME% %IMAGE_NAME%
@@ -37,7 +35,7 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                echo "🔍 Verifying running containers..."
+                echo "Verifying running containers..."
                 bat """
                     docker ps
                     echo Checking logs for %CONTAINER_NAME%
@@ -49,14 +47,11 @@ pipeline {
 
     post {
         success {
-            echo "✅ Build and Deployment Successful!"
-            echo "🌐 Visit your app at: http://localhost:8085"
+            echo "Build and Deployment Successful!"
+            echo "Visit your app at: http://localhost:8085"
         }
         failure {
-            echo "❌ Build failed. Check logs above for details."
+            echo "Build failed. Check logs for details."
         }
     }
 }
-git add Jenkinsfile
-git commit -m "Final Jenkinsfile with verification"
-git push origin main
